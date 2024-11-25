@@ -1,26 +1,60 @@
 # Awala VPN Gateway Shield
 
-The [Awala VPN](https://awala.app/en/vpn/) Gateway Shield,
+The [Awala VPN](https://awala.app/en/vpn/tech-overview/) Gateway Shield,
 or simply _shield_,
-is a globally-distributed server powered by [Cloudflare Workers](https://workers.cloudflare.com/) to minimise latency with Awala VPN tunnels.
-The shield is responsible for routing VPN traffic to a [gateway](https://github.com/AwalaApp/vpn-gateway),
-protecting the gateway from [DDoS attacks](https://ddos.report),
-enforcing usage quotas,
-and resolving DNS records,
-amongst other things.
+is a middleware between an Awala VPN [client](https://awala.app/en/vpn/tech-overview/#client) and its [gateway](https://awala.app/en/vpn/tech-overview/#gateway).
+The shield is powered by [Cloudflare Workers](https://workers.cloudflare.com/) to run at the edge.
+Its responsibilities include:
 
-To prevent eavesdropping from tunnel operators and other malicious actors,
-this server exposes a single HTTP endpoint (`POST /`),
-and all HTTP message payloads and WebSockets messages are to be end-to-end encrypted with the client.
+- Brokering connections between clients and gateways.
+- Using [Despacito](https://despacito.bot/) to protect gateways from [application DDoS attacks](https://ddos.report/overview/#application-attacks).
+- Enforcing usage quotas.
+- Resolving DNS records.
+- Simulating web browsing to obfuscate VPN traffic.
 
-## Operations
+## Client-Shield Protocol
 
-### Web browsing simulation
+The client and shield communicate over an end-to-end encrypted channel using Diffie-Hellman with X25519 keys.
+Key pairs are rotated every 60 minutes or when the client starts.
+The shield rejects requests with key pairs older than 60 minutes.
 
-The server supports two operations to help the client simulate that it's browsing the tunnel:
+To prevent replay attacks from malicious tunnels, each HTTP request includes a monotonically increasing sequence number,
+which is verified before processing and included in responses.
+The sequence number is tied to the client's key pair and resets to zero upon key rotation.
 
-- `web_browsing_simulation.webpage`: This returns a HTTP response that simulates a webpage. It actually contains the instructions to make requests to `web_browsing_simulation.asset`.
-- `web_browsing_simulation.asset`: This returns a HTTP response that simulates a web asset (e.g. an image, JavaScript file).
+HTTP requests and responses are padded to random sizes to mitigate traffic analysis.
+
+### Web Browsing Simulation
+
+The shield supports two operations to help clients simulate web browsing:
+
+- `web_browsing_simulation.webpage`: Returns a HTTP response simulating a webpage, containing instructions to request assets.
+- `web_browsing_simulation.asset`: Returns a HTTP response simulating a web asset (e.g., image, JavaScript file).
+
+### WebSocket Connection
+
+After simulating webpage retrieval,
+clients establish a WebSocket connection to relay IP packets.
+Both parties maintain encryption keys for the connection duration, even if key rotation occurs.
+
+To prevent replay attacks,
+each encrypted message includes the HTTP request sequence number and a monotonically increasing sequence number.
+The shield maintains a separate sequence for messages it sends.
+
+The connection also carries control messages (e.g., subscription data usage updates).
+
+To mitigate traffic analysis, the shield:
+
+- Exchanges bidirectional noise frames of random sizes at random intervals.
+- Pads each packet to a random size and/or batches packets.
+- Delays the first message from the gateway.
+
+## Shield-Gateway Protocol
+
+When a client starts a packet relay connection, the shield:
+
+1. Selects a gateway by reusing an existing session or allocating a new one.
+2. Relays E2E encrypted IP packets bidirectionally between client and gateway until either party closes the connection.
 
 ## Licence
 
