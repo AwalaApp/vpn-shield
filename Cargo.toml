@@ -2,7 +2,11 @@
 name = "awala-vpn-shield"
 version = "0.1.0"
 edition = "2021"
-authors = [ "Gus Narea <gnarea@users.noreply.github.com>" ]
+authors = [ "Relaycorp <https://relaycorp.tech>" ]
+description = "Awala VPN Gateway Shield"
+repository = "https://github.com/AwalaApp/vpn-shield"
+license-file = "LICENSE"
+publish = false
 
 [package.metadata.release]
 release = false
