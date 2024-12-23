@@ -10,3 +10,11 @@ publish = false
 
 [package.metadata.release]
 release = false
+
+[dependencies]
+axum = "0.7.9"
+tokio = { version = "1.42.0", features = ["full"] }
+anyhow = "1.0.95"
+
+[dev-dependencies]
+axum-test = "14.2.2"
