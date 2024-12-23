@@ -10,20 +10,3 @@ publish = false
 
 [package.metadata.release]
 release = false
-
-# https://github.com/rustwasm/wasm-pack/issues/1247
-[package.metadata.wasm-pack.profile.release]
-wasm-opt = false
-
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]
-worker = { version="0.4.2", features=['http'] }
-worker-macros = { version="0.4.2", features=['http'] }
-console_error_panic_hook = { version = "0.1.1" }
-http = "1.1"
-
-# Work around https://github.com/cloudflare/workers-rs/issues/668
-[patch.crates-io]
-wasm-bindgen = { git = "https://github.com/rustwasm/wasm-bindgen" }

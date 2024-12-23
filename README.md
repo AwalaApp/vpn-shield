@@ -2,12 +2,12 @@
 
 The [Awala VPN](https://awala.app/en/vpn/tech-overview/) Gateway Shield,
 or simply _shield_,
-is a middleware between an Awala VPN [client](https://awala.app/en/vpn/tech-overview/#client) and its [gateway](https://awala.app/en/vpn/tech-overview/#gateway).
-The shield is powered by [Cloudflare Workers](https://workers.cloudflare.com/) to run at the edge.
+is a middleware between an Awala VPN [client](https://awala.app/en/vpn/tech-overview/#client) and its [gateway](https://awala.app/en/vpn/tech-overview/#gateway),
+via a [tunnel](https://awala.app/en/vpn/tech-overview/#tunnel).
 Its responsibilities include:
 
 - Brokering connections between clients and gateways.
-- Using [Despacito](https://despacito.bot/) to protect gateways from [application DDoS attacks](https://ddos.report/overview/#application-attacks).
+- Mitigating [DDoS attacks](https://ddos.report).
 - Enforcing usage quotas.
 - Resolving DNS records.
 - Simulating web browsing to obfuscate VPN traffic.
@@ -55,6 +55,18 @@ When a client starts a packet relay connection, the shield:
 
 1. Selects a gateway by reusing an existing session or allocating a new one.
 2. Relays E2E encrypted IP packets bidirectionally between client and gateway until either party closes the connection.
+
+## DDoS Attacks Mitigation
+
+1. Internet layer mitigation: Host the app on a provider that provides [volumetric attack](https://ddos.report/overview/#volumetric-attacks) protection. Even better if they support BGP blackholing, to drop traffic from outside the shield's _catchment area_.
+2. Protocol layer mitigation: Run the app behind a mainstream reverse proxy (e.g., Caddy) for [protocol-level protection](https://ddos.report/overview/#protocol-attacks), which should be configured to:
+   - Drop connections from IP addresses outside the catchment area.
+   - Drop connections from known malicious IP addresses (e.g. using FireHOL IP Lists).
+   - Only allow connections from data centres. Residential IP addresses should be blocked.
+   - Rate-limit TCP connections per IP address, in a distributed manner.
+3. Application layer mitigation: Integrate [Despacito](https://despacito.bot/) in the shield app for [application-layer protection](https://ddos.report/overview/#application-attacks).
+
+See also the [Awala VPN threat model](https://awala.app/en/vpn/tech-overview/#threat-model).
 
 ## Licence
 
