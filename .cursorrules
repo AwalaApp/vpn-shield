@@ -1,0 +1,5 @@
+# Telemetry
+
+- Any behaviour observable from the outside MUST be logged, and/or have metrics and/or traces.
+- Anything about the client that could help with abuse or troubleshooting MUST be logged, including its IP address.
+- Anything that could directly or indirectly identify the VPN user MUST NOT be logged (e.g., their user id, DNS lookups).
