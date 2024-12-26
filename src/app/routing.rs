@@ -1,11 +1,15 @@
 use axum::{routing::get, Router};
+use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
 
 async fn hello() -> &'static str {
     "Hello world"
 }
 
 pub fn create_router() -> Router {
-    Router::new().route("/", get(hello))
+    Router::new()
+        .route("/", get(hello))
+        .layer(OtelInResponseLayer::default())
+        .layer(OtelAxumLayer::default())
 }
 
 #[cfg(test)]
