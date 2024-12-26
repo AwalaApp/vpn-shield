@@ -8,7 +8,7 @@ async fn hello() -> &'static str {
 pub fn create_router() -> Router {
     Router::new()
         .route("/", get(hello))
-        .layer(OtelInResponseLayer::default())
+        .layer(OtelInResponseLayer)
         .layer(OtelAxumLayer::default())
 }
 
