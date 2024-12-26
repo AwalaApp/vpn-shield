@@ -1,13 +1,24 @@
 use anyhow::Result;
-use awala_vpn_shield::create_router;
-
-const NETLOC: &str = "127.0.0.1:8080";
+use awala_vpn_shield::app::server;
+use std::env;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let app = create_router();
-    let listener = tokio::net::TcpListener::bind(NETLOC).await?;
-    println!("Server running on http://{}", NETLOC);
-    axum::serve(listener, app).await?;
+    let args: Vec<String> = env::args().collect();
+
+    match args.get(1).map(|s| s.as_str()) {
+        Some("serve") => {
+            server::run_server().await?;
+        }
+        Some(cmd) => {
+            eprintln!("Unknown command: {}", cmd);
+            std::process::exit(1);
+        }
+        None => {
+            eprintln!("Usage: {} serve", args[0]);
+            std::process::exit(1);
+        }
+    }
+
     Ok(())
 }

@@ -12,6 +12,13 @@ Its responsibilities include:
 - Resolving DNS records.
 - Simulating web browsing to obfuscate VPN traffic.
 
+## Usage
+
+Start the server:
+```bash
+cargo run -- serve
+```
+
 ## Client-Shield Protocol
 
 The client and shield communicate over an end-to-end encrypted channel using Diffie-Hellman with X25519 keys.
