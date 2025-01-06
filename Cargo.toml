@@ -12,7 +12,7 @@ publish = false
 release = false
 
 [dependencies]
-axum = "0.7.9"
+axum = "0.8.1"
 tokio = { version = "1.42.0", features = ["full"] }
 anyhow = "1.0.95"
 axum-tracing-opentelemetry = "0.24.1"
