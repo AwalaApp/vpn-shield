@@ -19,4 +19,4 @@ axum-tracing-opentelemetry = "0.24.1"
 init-tracing-opentelemetry = { version = "0.25.0", features = ["tracing_subscriber_ext", "otlp"] }
 
 [dev-dependencies]
-axum-test = "16.4.1"
+axum-test = "17.0.1"
